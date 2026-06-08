@@ -3,7 +3,14 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ParticipantController;
+use App\Http\Controllers\GameController;
 
+// Rutas para administrar los Partidos
+Route::get('/games/{quiniela_number}', [GameController::class, 'index']);
+Route::post('/games', [GameController::class, 'store']);
+Route::delete('/games/{id}', [GameController::class, 'destroy']);
+// --- NUEVA RUTA PARA GUARDAR GANADORES ---
+Route::put('/games/{id}/winner', [GameController::class, 'updateWinner']);
 /*
 |--------------------------------------------------------------------------
 | API Routes

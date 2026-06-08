@@ -7,7 +7,7 @@ use App\Models\Participant;
 
 class ParticipantController extends Controller
 {
-    // 1. Método para Guardar o Actualizar puntos (Panel de Control)
+    // 1. Panel de Control: Ahora crea un registro NUEVO siempre
     public function store(Request $request)
     {
         $request->validate([
@@ -15,11 +15,11 @@ class ParticipantController extends Controller
             'total_score' => 'required|numeric'
         ]);
 
-        // La magia: Si el jugador ya existe, le actualiza los puntos. Si no existe, lo crea.
-        $participant = Participant::updateOrCreate(
-            ['name' => $request->name],
-            ['total_score' => $request->total_score]
-        );
+        // Usamos create() en lugar de updateOrCreate() para permitir múltiples registros
+        $participant = Participant::create([
+            'name' => $request->name,
+            'total_score' => $request->total_score
+        ]);
 
         return response()->json([
             'success' => true,
@@ -28,18 +28,23 @@ class ParticipantController extends Controller
         ]);
     }
 
-    // 2. Método para Buscar (Buscador Público)
+    // 2. Buscador Público: Ahora busca TODOS los que coincidan con el nombre
     public function show($name)
     {
-        $participant = Participant::where('name', $name)->first();
+        // get() en lugar de first() trae todos los resultados. 
+        // orderBy los ordena del puntaje más alto al más bajo para que se vea mejor.
+        $participants = Participant::where('name', $name)
+                                   ->orderBy('total_score', 'desc')
+                                   ->get();
 
-        if (!$participant) {
+        // Si la lista está vacía, manda error 404
+        if ($participants->isEmpty()) {
             return response()->json(['success' => false, 'message' => 'No encontrado'], 404);
         }
 
         return response()->json([
             'success' => true,
-            'data' => $participant
+            'data' => $participants // Devuelve la lista completa
         ]);
     }
 }

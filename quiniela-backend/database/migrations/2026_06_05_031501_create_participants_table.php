@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             
             // Nuestras reglas de negocio:
-            $table->string('name')->unique();
+            $table->string('name'); 
             $table->integer('total_score')->default(0);
             
             $table->timestamps();

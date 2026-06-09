@@ -33,6 +33,7 @@ export default function AdminDashboard() {
   const loadGames = async (qNum: number, targetView: "manage_games" | "manage_scores") => {
     setIsLoading(true);
     try {
+      // ✅ CORREGIDO
       const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/games/${qNum}`);
       setGames(res.data.data);
       setView(targetView);
@@ -47,7 +48,8 @@ export default function AdminDashboard() {
   const loadGlobalScores = async (qNum: number) => {
     setIsLoading(true);
     try {
-      const res = await axios.get(`http://127.0.0.1:8000/api/leaderboard/${qNum}`);
+      // ✅ CORREGIDO
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/leaderboard/${qNum}`);
       setGlobalScores(res.data.data);
       setView("view_global_scores");
     } catch (error) {
@@ -61,7 +63,8 @@ export default function AdminDashboard() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await axios.post("http://127.0.0.1:8000/api/games", {
+      // ✅ CORREGIDO
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/games`, {
         quiniela_number: selectedQ,
         team_a: teamA,
         team_b: teamB,
@@ -80,7 +83,8 @@ export default function AdminDashboard() {
 
   const handleDelete = async (id: number) => {
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/games/${id}`);
+      // ✅ CORREGIDO
+      await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/games/${id}`);
       await loadGames(selectedQ, "manage_games");
     } catch (error) {
       console.error("Error al eliminar", error);
@@ -89,7 +93,8 @@ export default function AdminDashboard() {
 
   const handleSetWinner = async (gameId: number, winner: string) => {
     try {
-      await axios.put(`http://127.0.0.1:8000/api/games/${gameId}/winner`, { real_winner: winner });
+      // ✅ CORREGIDO
+      await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/games/${gameId}/winner`, { real_winner: winner });
       await loadGames(selectedQ, "manage_scores");
     } catch (error) {
       console.error("Error al asignar ganador", error);
@@ -173,7 +178,7 @@ export default function AdminDashboard() {
                   <input type="text" placeholder="Visitante" value={teamB} onChange={(e) => setTeamB(e.target.value)} required className="w-full px-4 py-3 rounded-xl border border-gray-300 outline-none text-gray-900 bg-white" />
                   <input type="datetime-local" value={startTime} onChange={(e) => setStartTime(e.target.value)} required className="w-full px-4 py-3 rounded-xl border border-gray-300 outline-none text-gray-900 bg-white" />
                 </div>
-                <div className="flex justify-end mt-4"><button type="submit" className="bg-green-800 text-white px-6 py-2 rounded-xl font-bold hover:bg-green-900 transition-colors">Registrar Partido</button></div>
+                <div className="flex justify-end mt-4"><button type="submit" disabled={isLoading} className="bg-green-800 text-white px-6 py-2 rounded-xl font-bold hover:bg-green-900 transition-colors disabled:opacity-50">{isLoading ? "Guardando..." : "Registrar Partido"}</button></div>
               </form>
               <div className="space-y-4">
                 {games.length === 0 ? <p className="text-center text-gray-500 py-8">No hay partidos registrados en esta quiniela aún.</p> : games.map((game, idx) => (
@@ -186,7 +191,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="flex items-center gap-4">
                       <span className="bg-gray-100 text-gray-700 px-4 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-2"><Clock className="w-4 h-4" /> {formatTime(game.start_time)}</span>
-                      <button onClick={() => handleDelete(game.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"><Trash2 className="w-5 h-5" /></button>
+                      <button onClick={() => handleDelete(game.id)} disabled={isLoading} className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors disabled:opacity-50"><Trash2 className="w-5 h-5" /></button>
                     </div>
                   </div>
                 ))}
@@ -227,9 +232,9 @@ export default function AdminDashboard() {
                       <span className="text-sm bg-white px-3 py-1 rounded-full border shadow-sm text-gray-600 font-medium flex items-center gap-2"><Clock className="w-3 h-3"/> {formatTime(game.start_time)}</span>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <button onClick={() => handleSetWinner(game.id, game.team_a)} className={`py-3 px-4 rounded-xl font-bold border-2 transition-all ${game.real_winner === game.team_a ? 'bg-green-600 text-white border-green-600 shadow-md' : 'bg-white text-gray-700 hover:border-green-600'}`}>Local: {game.team_a}</button>
-                      <button onClick={() => handleSetWinner(game.id, 'Empate')} className={`py-3 px-4 rounded-xl font-bold border-2 transition-all ${game.real_winner === 'Empate' ? 'bg-gray-600 text-white border-gray-600 shadow-md' : 'bg-white text-gray-700 hover:border-gray-600'}`}>Empate</button>
-                      <button onClick={() => handleSetWinner(game.id, game.team_b)} className={`py-3 px-4 rounded-xl font-bold border-2 transition-all ${game.real_winner === game.team_b ? 'bg-green-600 text-white border-green-600 shadow-md' : 'bg-white text-gray-700 hover:border-green-600'}`}>Visitante: {game.team_b}</button>
+                      <button onClick={() => handleSetWinner(game.id, game.team_a)} disabled={isLoading} className={`py-3 px-4 rounded-xl font-bold border-2 transition-all ${game.real_winner === game.team_a ? 'bg-green-600 text-white border-green-600 shadow-md' : 'bg-white text-gray-700 hover:border-green-600'} disabled:opacity-50`}>Local: {game.team_a}</button>
+                      <button onClick={() => handleSetWinner(game.id, 'Empate')} disabled={isLoading} className={`py-3 px-4 rounded-xl font-bold border-2 transition-all ${game.real_winner === 'Empate' ? 'bg-gray-600 text-white border-gray-600 shadow-md' : 'bg-white text-gray-700 hover:border-gray-600'} disabled:opacity-50`}>Empate</button>
+                      <button onClick={() => handleSetWinner(game.id, game.team_b)} disabled={isLoading} className={`py-3 px-4 rounded-xl font-bold border-2 transition-all ${game.real_winner === game.team_b ? 'bg-green-600 text-white border-green-600 shadow-md' : 'bg-white text-gray-700 hover:border-green-600'} disabled:opacity-50`}>Visitante: {game.team_b}</button>
                     </div>
                   </div>
                 ))}

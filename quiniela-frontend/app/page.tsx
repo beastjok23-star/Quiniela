@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import axios from "axios";
-import { Trophy, CalendarDays, ArrowLeft, Plus, Trash2, Clock, CheckCircle2, Users } from "lucide-react";
+import { Trophy, CalendarDays, ArrowLeft, Trash2, CheckCircle2, Users } from "lucide-react";
 
 interface Game {
   id: number;
@@ -59,6 +59,7 @@ export default function AdminDashboard() {
     e.preventDefault();
     setIsLoading(true);
     try {
+      // Usamos quiniela_number tal cual lo exige tu Laravel Controller
       await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/games`, {
         quiniela_number: selectedQ,
         team_a: teamA,
@@ -128,7 +129,7 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* --- PANTALLA 2: SELECCIÓN DE QUINIELA (PARTIDOS) --- */}
+        {/* --- PANTALLA 2: SELECCIÓN DE QUINIELA --- */}
         {view === "quinielas" && (
           <div className="bg-white rounded-3xl p-8 shadow-sm">
             <button onClick={() => setView("main")} className="mb-6 p-2"><ArrowLeft className="w-6 h-6" /></button>
@@ -163,7 +164,7 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* --- PANTALLA 4: SELECCIÓN DE QUINIELA (CALIFICAR) --- */}
+        {/* --- PANTALLA 4: SELECCIÓN PUNTUACIÓN --- */}
         {view === "puntuacion" && (
           <div className="bg-white rounded-3xl p-8 shadow-sm">
             <button onClick={() => setView("main")} className="mb-6 p-2"><ArrowLeft /></button>
@@ -196,7 +197,7 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* --- PANTALLA 6: SELECCIÓN DE QUINIELA (VER PUNTUACIONES) --- */}
+        {/* --- PANTALLA 6: SELECCIÓN PUNTUACIONES GLOBALES --- */}
         {view === "ver_global" && (
           <div className="bg-white rounded-3xl p-8 shadow-sm">
             <button onClick={() => setView("main")} className="mb-6 p-2"><ArrowLeft /></button>

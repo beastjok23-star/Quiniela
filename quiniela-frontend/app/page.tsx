@@ -44,7 +44,7 @@ export default function Home() {
     setErrorMessage("");
     setPredictions({});
     try {
-      const res = await axios.get(`http://127.0.0.1:8000/api/games/${qNum}`);
+      const res = await axios.get(`https://quiniela-production-704a.up.railway.app/api/games/${qNum}`);
       setGames(res.data.data);
       setView("registro_games");
     } catch (error) {
@@ -60,7 +60,7 @@ export default function Home() {
     setSearchInput(""); 
     setSubmittedSearch(""); // Limpiar búsquedas anteriores
     try {
-      const res = await axios.get(`http://127.0.0.1:8000/api/leaderboard/${qNum}`);
+      const res = await axios.get(`https://quiniela-production-704a.up.railway.app/api/leaderboard/${qNum}`);
       setLeaderboard(res.data.data);
       setView("tabla_leaderboard");
     } catch (error) {
@@ -101,7 +101,7 @@ export default function Home() {
     }));
 
     try {
-      await axios.post("http://127.0.0.1:8000/api/participant", {
+      await axios.post("https://quiniela-production-704a.up.railway.app/api/participant", {
         participant_name: playerName,
         quiniela_number: selectedQ,
         predictions: formattedPredictions

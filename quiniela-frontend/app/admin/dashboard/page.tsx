@@ -33,7 +33,6 @@ export default function AdminDashboard() {
   const loadGames = async (qNum: number, targetView: "manage_games" | "manage_scores") => {
     setIsLoading(true);
     try {
-      // ✅ CORREGIDO
       const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/games/${qNum}`);
       setGames(res.data.data);
       setView(targetView);
@@ -48,7 +47,6 @@ export default function AdminDashboard() {
   const loadGlobalScores = async (qNum: number) => {
     setIsLoading(true);
     try {
-      // ✅ CORREGIDO
       const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/leaderboard/${qNum}`);
       setGlobalScores(res.data.data);
       setView("view_global_scores");
@@ -63,9 +61,9 @@ export default function AdminDashboard() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      // ✅ CORREGIDO
+      // ✅ CORREGIDO: Se cambió quiniela_number por quiniela_id
       await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/games`, {
-        quiniela_number: selectedQ,
+        quiniela_id: selectedQ, 
         team_a: teamA,
         team_b: teamB,
         start_time: startTime,
@@ -83,7 +81,6 @@ export default function AdminDashboard() {
 
   const handleDelete = async (id: number) => {
     try {
-      // ✅ CORREGIDO
       await axios.delete(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/games/${id}`);
       await loadGames(selectedQ, "manage_games");
     } catch (error) {
@@ -93,7 +90,6 @@ export default function AdminDashboard() {
 
   const handleSetWinner = async (gameId: number, winner: string) => {
     try {
-      // ✅ CORREGIDO
       await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/games/${gameId}/winner`, { real_winner: winner });
       await loadGames(selectedQ, "manage_scores");
     } catch (error) {

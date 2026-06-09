@@ -10,7 +10,7 @@ class Game extends Model
     use HasFactory;
 
     // Campos que permitimos guardar
-    protected $fillable = ['quiniela_number', 'team_a', 'team_b', 'start_time', 'real_winner'];
+    protected $fillable = ['team_a', 'team_b', 'start_time', 'quiniela_id', 'status']; // Agrega los tuyos
 
     // Relación: Un partido tiene muchas predicciones de usuarios
     public function predictions()

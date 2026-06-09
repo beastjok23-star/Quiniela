@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import axios from "axios";
-import { Trophy, CalendarDays, ArrowLeft, Plus, Trash2, CheckCircle2, Users } from "lucide-react";
+import { Trophy, CalendarDays, ArrowLeft, Plus, Trash2, Clock, CheckCircle2, Users } from "lucide-react";
 
 interface Game {
   id: number;
@@ -59,7 +59,6 @@ export default function AdminDashboard() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      // Envío de datos corregido para coincidir con el Backend
       await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/games`, {
         quiniela_number: selectedQ,
         team_a: teamA,
@@ -72,7 +71,7 @@ export default function AdminDashboard() {
       await loadGames(selectedQ, "manage_games");
     } catch (error) {
       console.error("Error al guardar:", (error as any).response?.data || error);
-      alert("Error al guardar: Revisa la consola para más detalles.");
+      alert("Error al guardar. Revisa la consola (F12).");
     } finally {
       setIsLoading(false);
     }
@@ -96,6 +95,11 @@ export default function AdminDashboard() {
     }
   };
 
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString("es-MX", { hour: '2-digit', minute: '2-digit', hour12: true });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-6xl mx-auto">
@@ -105,47 +109,53 @@ export default function AdminDashboard() {
           </h1>
         </div>
 
+        {/* --- MENU PRINCIPAL --- */}
         {view === "main" && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <button onClick={() => setView("quinielas")} className="bg-white p-8 rounded-3xl shadow-sm border-2 border-transparent hover:border-green-600 transition-all">
+            <button onClick={() => setView("quinielas")} className="bg-white p-8 rounded-3xl shadow-sm border-2 border-transparent hover:border-green-600 transition-all flex flex-col items-center">
               <CalendarDays className="w-16 h-16 text-green-800 mb-4" />
               <h2 className="text-xl font-bold">Quinielas</h2>
             </button>
-            <button onClick={() => setView("puntuacion")} className="bg-white p-8 rounded-3xl shadow-sm border-2 border-transparent hover:border-yellow-500 transition-all">
+            <button onClick={() => setView("puntuacion")} className="bg-white p-8 rounded-3xl shadow-sm border-2 border-transparent hover:border-yellow-500 transition-all flex flex-col items-center">
               <CheckCircle2 className="w-16 h-16 text-yellow-500 mb-4" />
               <h2 className="text-xl font-bold">Puntuación</h2>
             </button>
-            <button onClick={() => setView("ver_global")} className="bg-white p-8 rounded-3xl shadow-sm border-2 border-transparent hover:border-blue-600 transition-all">
+            <button onClick={() => setView("ver_global")} className="bg-white p-8 rounded-3xl shadow-sm border-2 border-transparent hover:border-blue-600 transition-all flex flex-col items-center">
               <Users className="w-16 h-16 text-blue-600 mb-4" />
               <h2 className="text-xl font-bold">Puntajes Globales</h2>
             </button>
           </div>
         )}
 
-        {view === "quinielas" && (
+        {/* --- SELECCIÓN DE QUINIELA --- */}
+        {(view === "quinielas" || view === "puntuacion" || view === "ver_global") && (
           <div className="bg-white rounded-3xl p-8 shadow-sm">
             <button onClick={() => setView("main")} className="mb-6 p-2"><ArrowLeft /></button>
             <h2 className="text-2xl font-bold mb-6">Selecciona Quiniela</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[1, 2, 3, 4].map((num) => (
-                <button key={num} onClick={() => { setSelectedQ(num); loadGames(num, "manage_games"); }} className="py-8 bg-green-50 rounded-2xl font-bold text-xl">Quiniela {num}</button>
+                <button key={num} onClick={() => {
+                  setSelectedQ(num);
+                  if (view === "quinielas") loadGames(num, "manage_games");
+                  if (view === "puntuacion") loadGames(num, "manage_scores");
+                  if (view === "ver_global") loadGlobalScores(num);
+                }} className="py-8 bg-green-50 rounded-2xl font-bold text-xl">Quiniela {num}</button>
               ))}
             </div>
           </div>
         )}
 
+        {/* --- GESTIÓN DE PARTIDOS --- */}
         {view === "manage_games" && (
           <div className="bg-white rounded-3xl p-8 shadow-sm">
             <button onClick={() => setView("quinielas")} className="mb-6 p-2"><ArrowLeft /></button>
-            <h2 className="text-2xl font-bold mb-6">Gestionar Partidos - Quiniela {selectedQ}</h2>
-            
+            <h2 className="text-2xl font-bold mb-6">Partidos - Q{selectedQ}</h2>
             <form onSubmit={handleAddGame} className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
               <input type="text" placeholder="Local" value={teamA} onChange={(e) => setTeamA(e.target.value)} required className="p-3 border rounded-xl" />
               <input type="text" placeholder="Visitante" value={teamB} onChange={(e) => setTeamB(e.target.value)} required className="p-3 border rounded-xl" />
               <input type="datetime-local" value={startTime} onChange={(e) => setStartTime(e.target.value)} required className="p-3 border rounded-xl" />
-              <button type="submit" disabled={isLoading} className="bg-green-800 text-white rounded-xl font-bold">{isLoading ? "Guardando..." : "Registrar"}</button>
+              <button type="submit" className="bg-green-800 text-white rounded-xl font-bold">Registrar</button>
             </form>
-
             {games.map((game) => (
               <div key={game.id} className="flex justify-between items-center p-4 border-b">
                 <span>{game.team_a} vs {game.team_b}</span>
@@ -155,7 +165,37 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* ... (Las demás vistas de puntuación y global permanecen similares) ... */}
+        {/* --- ASIGNAR GANADORES --- */}
+        {view === "manage_scores" && (
+          <div className="bg-white rounded-3xl p-8 shadow-sm">
+            <button onClick={() => setView("puntuacion")} className="mb-6 p-2"><ArrowLeft /></button>
+            <h2 className="text-2xl font-bold mb-6">Ganadores - Q{selectedQ}</h2>
+            {games.map((game) => (
+              <div key={game.id} className="p-4 border rounded-xl flex justify-between items-center mb-2">
+                <span>{game.team_a} vs {game.team_b}</span>
+                <div className="flex gap-2">
+                  <button onClick={() => handleSetWinner(game.id, game.team_a)} className="bg-gray-100 p-2 rounded text-xs">Local</button>
+                  <button onClick={() => handleSetWinner(game.id, 'Empate')} className="bg-gray-100 p-2 rounded text-xs">Empate</button>
+                  <button onClick={() => handleSetWinner(game.id, game.team_b)} className="bg-gray-100 p-2 rounded text-xs">Visita</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* --- RANKING --- */}
+        {view === "view_global_scores" && (
+          <div className="bg-white rounded-3xl p-8 shadow-sm">
+            <button onClick={() => setView("ver_global")} className="mb-6 p-2"><ArrowLeft /></button>
+            <h2 className="text-2xl font-bold mb-6">Ranking - Q{selectedQ}</h2>
+            {globalScores.map((score, idx) => (
+              <div key={score.id} className="p-4 border-b flex justify-between">
+                <span>{idx + 1}. {score.participant_name}</span>
+                <span className="font-bold">{score.total_score} pts</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

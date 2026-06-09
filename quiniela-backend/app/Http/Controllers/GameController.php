@@ -9,7 +9,7 @@ use App\Models\Prediction;
 
 class GameController extends Controller
 {
-    // Traer todos los partidos de una quiniela específica
+    // 1. Traer todos los partidos de una quiniela
     public function index($quiniela_number)
     {
         $games = Game::where('quiniela_number', $quiniela_number)
@@ -19,10 +19,9 @@ class GameController extends Controller
         return response()->json(['success' => true, 'data' => $games]);
     }
 
-    // Agregar un nuevo partido
+    // 2. Agregar un nuevo partido
     public function store(Request $request)
     {
-        // Validación estricta: espera quiniela_number
         $validated = $request->validate([
             'quiniela_number' => 'required|integer',
             'team_a' => 'required|string',
@@ -35,14 +34,14 @@ class GameController extends Controller
         return response()->json(['success' => true, 'data' => $game]);
     }
 
-    // Eliminar un partido
+    // 3. Eliminar un partido
     public function destroy($id)
     {
         Game::destroy($id);
         return response()->json(['success' => true]);
     }
 
-    // Actualizar ganador y recalcular puntos
+    // 4. ESTO ES LO QUE TE FALTABA: Actualizar ganador y recalcular puntos
     public function updateWinner(Request $request, $id)
     {
         $request->validate([
@@ -54,10 +53,11 @@ class GameController extends Controller
             return response()->json(['success' => false, 'message' => 'Partido no encontrado'], 404);
         }
 
+        // Guardamos el ganador real
         $game->real_winner = $request->real_winner;
         $game->save();
 
-        // Recalcular puntajes para todos los participantes de esa quiniela
+        // Recalcular puntajes para todos los participantes de esta quiniela
         $entries = Entry::where('quiniela_number', $game->quiniela_number)->get();
 
         foreach ($entries as $entry) {

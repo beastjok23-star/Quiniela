@@ -33,7 +33,7 @@ export default function AdminDashboard() {
   const loadGames = async (qNum: number, targetView: "manage_games" | "manage_scores") => {
     setIsLoading(true);
     try {
-      const res = await axios.get(`http://127.0.0.1:8000/api/games/${qNum}`);
+      const res = await axios.get(`https://quiniela-production-704a.up.railway.app/api/games/${qNum}`);
       setGames(res.data.data);
       setView(targetView);
     } catch (error) {

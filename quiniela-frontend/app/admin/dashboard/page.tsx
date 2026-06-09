@@ -61,7 +61,6 @@ export default function AdminDashboard() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      // ✅ CORREGIDO: Se cambió quiniela_number por quiniela_id
       await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/games`, {
         quiniela_id: selectedQ, 
         team_a: teamA,
@@ -73,7 +72,8 @@ export default function AdminDashboard() {
       setStartTime("");
       await loadGames(selectedQ, "manage_games");
     } catch (error) {
-      console.error("Error al guardar", error);
+      // ✅ CORREGIDO: Truco para TypeScript activado, nos mostrará el mensaje real de Laravel
+      console.error("Error al guardar. El servidor dice:", (error as any).response?.data || error);
     } finally {
       setIsLoading(false);
     }
@@ -117,7 +117,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* --- PANTALLA 1: MENÚ PRINCIPAL (AHORA CON 3 OPCIONES) --- */}
+        {/* --- PANTALLA 1: MENÚ PRINCIPAL --- */}
         {view === "main" && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <button onClick={() => setView("quinielas")} className="bg-white p-8 rounded-3xl shadow-sm border-2 border-transparent hover:border-green-600 transition-all group flex flex-col items-center text-center">
@@ -240,7 +240,7 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* --- PANTALLA 6: SELECCIÓN DE QUINIELA (PUNTAJES GLOBALES) (NUEVO) --- */}
+        {/* --- PANTALLA 6: SELECCIÓN DE QUINIELA (PUNTAJES GLOBALES) --- */}
         {view === "ver_global" && (
           <div className="bg-white rounded-3xl p-8 shadow-sm">
             <div className="flex items-center gap-4 mb-8">
@@ -255,7 +255,7 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* --- PANTALLA 7: TABLA DE POSICIONES COMPLETA PARA EL ADMIN (NUEVO) --- */}
+        {/* --- PANTALLA 7: TABLA DE POSICIONES COMPLETA PARA EL ADMIN --- */}
         {view === "view_global_scores" && (
           <div className="space-y-6">
             <div className="bg-white rounded-3xl p-8 shadow-sm">

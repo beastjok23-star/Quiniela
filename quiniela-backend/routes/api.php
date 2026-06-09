@@ -5,12 +5,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\GameController;
 
-// Rutas para administrar los Partidos
-Route::get('/games/{quiniela_number}', [GameController::class, 'index']);
-Route::post('/games', [GameController::class, 'store']);
-Route::delete('/games/{id}', [GameController::class, 'destroy']);
-// --- NUEVA RUTA PARA GUARDAR GANADORES ---
-Route::put('/games/{id}/winner', [GameController::class, 'updateWinner']);
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -22,13 +16,17 @@ Route::put('/games/{id}/winner', [GameController::class, 'updateWinner']);
 |
 */
 
-// --- RUTA CLAVE PARA ARREGLAR TU ERROR ---
-// Esta línea le dice a Laravel cómo manejar el envío de datos desde tu formulario.
-Route::post('/participant', [ParticipantController::class, 'store']);
-// ----------------------------------------
+// --- RUTAS PARA ADMINISTRAR LOS PARTIDOS (PANEL ADMIN) ---
+Route::get('/games/{quiniela_number}', [GameController::class, 'index']);
+Route::post('/games', [GameController::class, 'store']);
+Route::delete('/games/{id}', [GameController::class, 'destroy']);
+Route::put('/games/{id}/winner', [GameController::class, 'updateWinner']);
 
-// Esta es la ruta pública que usa tu buscador
-Route::get('/participant/{name}', [ParticipantController::class, 'show']);
+// --- RUTAS PÚBLICAS DEL JUGADOR (QUINELAS) ---
+// Para guardar el boleto con todas las selecciones y revisar el tiempo
+Route::post('/participant', [ParticipantController::class, 'store']);
+// Para ver la tabla de posiciones (leaderboard) de cada quiniela
+Route::get('/leaderboard/{quiniela_number}', [ParticipantController::class, 'leaderboard']);
 
 // Esta ruta viene por defecto, la dejamos
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
